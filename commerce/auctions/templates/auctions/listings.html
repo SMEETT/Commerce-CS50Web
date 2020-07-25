@@ -1,0 +1,50 @@
+{% extends "auctions/layout.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+{{ listing.title }}
+{% endblock%}
+
+{% block body %}
+<div class="d-flex justify-content-start d-flex align-items-center">
+    <h2>{{ listing.title }}</h2>
+    
+    {% if listing.closed %}
+        <span class="badge badge-secondary listing-badge">Closed</span>
+    {% else %}
+        <span class="badge badge-success listing-badge">Active</span>
+    {% endif %}
+
+    <span class="badge badge-warning listing-badge">{{ listing.category }}</span>
+    <span class="badge badge-dark listing-badge">{{ listing.user.username }}</span>
+</div>
+
+<a class="btn btn-primary" href="/watchlist">Add to Watchlist</a>
+
+<div class="border gen-margin-top">
+    <img class="listing-img" src="{{ listing.imgurl }}" alt="">
+</div>
+<div class="border listing-description">
+    {{ listing.description }}
+</div>
+    <div class="d-flex justify-content-start align-items-center border">
+        {% if highest_bid %}
+        <h3 class="gen-margin-right">${{ highest_bid.bid }}</h3>
+        {% else %}
+        <h3 class="gen-margin-right">${{ listing.price }}</h3>
+        {% endif %}
+        <form action="{% url 'auctions:place_bid' listing.id %}" method="post">
+            {% csrf_token %}
+            <div class="form-row gen-margin-top">
+                <div class="form-group col-sm-8 mb-0">
+                    {{ bid_form.bid|as_crispy_field }}
+                </div>
+                <div class="form-group col-sm-4 mb-0">
+                    <button type="submit" class="btn btn-primary">Place Bid</button>
+                </div>
+            </div>         
+        </form>
+    </div>  
+
+{% endblock %}

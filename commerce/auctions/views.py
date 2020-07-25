@@ -1,16 +1,20 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
 
-from .forms import CreateListingForm
-from .models import User, Listing
+from .forms import CreateListingForm, BidForm
+from .models import User, Category, Listing, Comment, Bid, Watchlist
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listings = Listing.objects.all()
+
+    return render(request, "auctions/index.html", {
+        'listings': listings
+    })
 
 
 def login_view(request):
@@ -75,8 +79,11 @@ def create_listing(request):
             form_tmp.user = request.user
             # save the form (including current user) to DB
             form_tmp.save()
-
             return HttpResponseRedirect(reverse("auctions:index"))
+        else:
+            return render(request, "auctions/error.html", {
+                "error": "Something went wrong :("
+            })
         
 
     elif request.method == "GET":
@@ -88,3 +95,34 @@ def create_listing(request):
         return render(request, "auctions/create_listing.html", {
             "form": form
         })
+
+
+def listings(request, listing_id):
+    
+    listing = Listing.objects.get(id=int(listing_id))
+    highest_bid = Bid.objects.all().filter(listing__id=listing_id).order_by("-bid").first()
+    bid_form = BidForm()
+
+    return render(request, "auctions/listings.html", {
+        "listing": listing,
+        "bid_form": bid_form,
+        "highest_bid": highest_bid,
+    })
+
+def place_bid(request, listing_id):
+    if request.method == "POST":
+        form = BidForm(request.POST)
+        listing = Listing.objects.get(id=int(listing_id))
+
+        if form.is_valid():
+            form_tmp = form.save(commit=False)
+            form_tmp.user = request.user
+            form_tmp.listing = listing
+            form_tmp.save()
+            return redirect('auctions:listings', listing_id=listing_id)
+
+            
+            
+
+    elif request.method == "GET":
+        return HttpResponseRedirect(reverse("auctions:index"))

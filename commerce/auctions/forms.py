@@ -1,5 +1,5 @@
 from django import forms
-from .models import Listing, Category
+from .models import Listing, Category, Bid
 
 class CreateListingForm(forms.ModelForm):
     # populate the CATEGORY dropdown with all available categories
@@ -18,4 +18,16 @@ class CreateListingForm(forms.ModelForm):
         labels = {
             'imgurl': "Image URL",
             'price': 'Starting Bid',
+        }
+
+
+class BidForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ('bid',)
+        widgets = {
+            'bid': forms.NumberInput(attrs={'placeholder': 'Place your Bid'})
+        }
+        labels = {
+            'bid': "",
         }
