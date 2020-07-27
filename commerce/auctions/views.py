@@ -94,7 +94,7 @@ def place_bid(request, listing_id):
                     "listing": listing,
                     "bid_form": bid_form,
                     "comment_form": comment_form,
-                    "highest_bid": highest_bid1
+                    "highest_bid": highest_bid
                 })
 
             form_tmp = bid_form.save(commit=False)
