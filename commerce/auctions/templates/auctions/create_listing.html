@@ -1,5 +1,7 @@
 {% extends "auctions/layout.html" %}
 
+{% load crispy_forms_tags %}
+
 {% block body %}
 <h2>Create Listing</h2>
 
@@ -11,7 +13,9 @@
 <form action="{% url 'auctions:create_listing' %}" method="post">
     <div class="form-group">
         {% csrf_token %}
-        {{ form.as_p }}
+        
+        {{ form|crispy }}
+        
     </div>
     <input type="submit" value="Create" class="btn btn-primary">
 </form>

@@ -25,26 +25,54 @@
 <div class="border gen-margin-top">
     <img class="listing-img" src="{{ listing.imgurl }}" alt="">
 </div>
+
 <div class="border listing-description">
     {{ listing.description }}
 </div>
-    <div class="d-flex justify-content-start align-items-center border">
-        {% if highest_bid %}
-        <h3 class="gen-margin-right">${{ highest_bid.bid }}</h3>
-        {% else %}
-        <h3 class="gen-margin-right">${{ listing.price }}</h3>
-        {% endif %}
-        <form action="{% url 'auctions:place_bid' listing.id %}" method="post">
+
+<div class="d-flex justify-content-start border pt-3">
+    {% if highest_bid %}
+    <h3 class="gen-margin-right mt-0">${{ highest_bid }}</h3>
+    {% else %}
+    <h3 class="gen-margin-right mt-0">${{ listing.price }}</h3>
+    {% endif %}
+    <form action="{% url 'auctions:place_bid' listing.id %}" method="post">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group col-sm-8 mb-0">
+                {{ bid_form.bid|as_crispy_field }}
+            </div>
+            <div class="form-group col-sm-4 mb-0">
+                <button type="submit" class="btn btn-primary">Place Bid</button>
+            </div>
+        </div>         
+    </form>
+</div>
+
+{% if comments %}
+    <div class="mt-5">
+        <div>
+            {% for comment in comments %}
+                <div> {{ comment}} </div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>No comments yet!</p>
+{% endif %}
+
+    <div class="mt-5">
+        <form action="{% url 'auctions:post_comment' listing.id %}" method="post">
             {% csrf_token %}
-            <div class="form-row gen-margin-top">
+            <div class="form">
                 <div class="form-group col-sm-8 mb-0">
-                    {{ bid_form.bid|as_crispy_field }}
+                    {{ comment_form.comment|as_crispy_field }}
                 </div>
                 <div class="form-group col-sm-4 mb-0">
-                    <button type="submit" class="btn btn-primary">Place Bid</button>
+                    <button type="submit" class="btn btn-primary">Post</button>
                 </div>
             </div>         
         </form>
-    </div>  
+    </div>
 
 {% endblock %}
