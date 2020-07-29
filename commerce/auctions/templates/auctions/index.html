@@ -1,12 +1,48 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>Active Listings ({{ listings_count }})</h2>
 
-    {% for item in listings %}
-        <ul>
-            <li><a href="/listings/{{ item.id }}">{{ item }}</a></li>
-        </ul>
-    {% endfor %}
+<div class="container">
+    <div class="row">
+{% for item in listing_list %}
+<div class="container w-50 ml-0">
+    <div class="card border my-2">
+        <div class="container">
+            <div class="row">
+
+                <div class="d-flex justify-content-start align-items-center">
+                    <h4 class="ml-2 mt-1"><a href="/listings/{{ item.id }}">{{ item }}</a></h4>
+                <!-- LISTING BADGES -->
+                    <span class="badge badge-warning listing-badge">{{ item.category }}</span>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="col-9">
+                    <img class="card-img-left my-2 ml-2" src="{{ item.imgurl }}" alt="">
+                </div>
+                <div class="col my-auto">
+                    <a class="btn btn-primary" href="/listings/{{ item.id }}">Details</a>
+                </div>
+            </div>
+            <div class="row border-top py-2">
+                <div class="col-8 mt-2 my-auto">
+                    <p class="d-inline"><i>About:</i></p> <p class="text-info d-inline">{{ item.description }}</p>
+                </div>
+                <div class="col-4 my-auto">
+                    {% if item.highest_bid %}
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.highest_bid }} </p>
+                    {% else %}
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.price }} </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+</div>
     
 {% endblock %}

@@ -1,5 +1,6 @@
 {% extends "auctions/layout.html" %}
 
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block title %}
@@ -8,35 +9,53 @@
 
 {% block body %}
 <div class="d-flex justify-content-start d-flex align-items-center">
+    
     <h2>{{ listing.title }}</h2>
     
+<!-- LISTING BADGES -->
+
     {% if listing.closed %}
         <span class="badge badge-secondary listing-badge">Closed</span>
     {% else %}
         <span class="badge badge-success listing-badge">Active</span>
     {% endif %}
-
     <span class="badge badge-warning listing-badge">{{ listing.category }}</span>
     <span class="badge badge-dark listing-badge">{{ listing.user.username }}</span>
 </div>
 
-<a class="btn btn-primary" href="/watchlist">Add to Watchlist</a>
+<!-- ADD TO WATCHLIST -->
+{% if watchlist_entry %}
+    <a class="btn btn-secondary" href="{% url 'auctions:watchlist_toggle' listing.id %}">Remove from Watchlist</a>
+{% else %}
+    <a class="btn btn-primary" href="{% url 'auctions:watchlist_toggle' listing.id %}">Add to Watchlist</a>
+{% endif %}
 
-<div class="border gen-margin-top">
+
+<!-- LISTING IMAGE -->
+
+<div class="border mt-2">
     <img class="listing-img" src="{{ listing.imgurl }}" alt="">
 </div>
 
+<!-- LISTING DESCRIPTION -->
+
 <div class="border listing-description">
-    {{ listing.description }}
+    <i>About: </i> {{ listing.description }}
 </div>
 
-<div class="d-flex justify-content-start border pt-3">
+<!-- CURRENT PRICE -->
+
+<div class="d-flex justify-content-start border pt-3 mt-2">
     {% if highest_bid %}
-    <h3 class="gen-margin-right mt-0">${{ highest_bid }}</h3>
+    <h3 class="mt-0 mx-2">${{ highest_bid }}</h3>
     {% else %}
-    <h3 class="gen-margin-right mt-0">${{ listing.price }}</h3>
+    <h3 class="mt-0 mx-2">${{ listing.price }}</h3>
     {% endif %}
-    <form action="{% url 'auctions:place_bid' listing.id %}" method="post">
+
+<!-- PLACE BID FORM -->
+
+    <form action="{% url 'auctions:listings' listing.id %}" method="post">
+        <input type="hidden" name="form_type" value="place_bid">
         {% csrf_token %}
         <div class="form-row">
             <div class="form-group col-sm-8 mb-0">
@@ -49,30 +68,61 @@
     </form>
 </div>
 
-{% if comments %}
-    <div class="mt-5">
-        <div>
-            {% for comment in comments %}
-                <div> {{ comment}} </div>
-            {% endfor %}
+<!-- COMMENT SECTION -->
+
+<div class='container mt-4 ml-0 pl-0'>
+<h3>Comments</h3>
+</div>
+
+<div class="container ml-0 pl-0">
+    <div class="row">
+        <div class="col-8">
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="card card-white post mt-2">
+                        <div class="post-heading">
+                            <div class="float-left image">
+                                <img src="{% static "auctions/images/portrait.jpg" %}" class="img-circle avatar" alt="user profile image">
+                            </div>
+                            <div class="float-left meta">
+                                <div class="title h5">
+                                    <a href="#"><b>{{ comment.user.username }}</b></a>
+                                    posted a comment.
+                                </div>
+                                <h6 class="text-muted time">{{ comment.date_created }}</h6>
+                            </div>
+                        </div> 
+                        <div class="post-description"> 
+                            <p>{{ comment.comment }}</p>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+            <p>No comments yet!</p>
+            {% endif %}
         </div>
     </div>
-{% else %}
-    <p>No comments yet!</p>
-{% endif %}
+</div>
 
-    <div class="mt-5">
-        <form action="{% url 'auctions:post_comment' listing.id %}" method="post">
-            {% csrf_token %}
-            <div class="form">
-                <div class="form-group col-sm-8 mb-0">
-                    {{ comment_form.comment|as_crispy_field }}
-                </div>
-                <div class="form-group col-sm-4 mb-0">
-                    <button type="submit" class="btn btn-primary">Post</button>
-                </div>
-            </div>         
-        </form>
+<!-- POST COMMENT -->
+
+<div class="container-fluid mt-4 ml-0 pl-4">
+    <div class="row no-gutters">
+        <div class="col-10">
+            <form action="{% url 'auctions:listings' listing.id %}" method="post">
+                <input type="hidden" name="form_type" value="post_comment">
+                {% csrf_token %}
+                <div class="form">
+                    <div class="form-group col-md-8 px-0">
+                        {{ comment_form.comment|as_crispy_field }}
+                    </div>
+                    <div class="form-group col-md-4 px-0">
+                        <button type="submit" class="btn btn-primary mt-0">Post</button>
+                    </div>
+                </div>         
+            </form>
+        </div>
     </div>
+</div>
 
 {% endblock %}
