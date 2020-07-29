@@ -5,9 +5,127 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django import forms
 from decimal import Decimal
+from django.views.generic import ListView
 
 from .forms import CreateListingForm, BidForm, CommentForm
 from .models import User, Category, Listing, Comment, Bid, Watchlist
+
+
+
+class IndexList(ListView):
+    model = Listing
+    template_name = "auctions/index.html"
+
+
+def watchlist(request):
+    pass
+
+
+def watchlist_toggle(request, listing_id):
+    if request.user.is_authenticated:
+        # query listings by listing_id (or render error)
+        try:
+            listing = Listing.objects.get(id=int(listing_id))
+        except:
+            return render(request, "error.html", {
+                "error": "404 / Listing doesn't exist."
+            })
+        try:
+            watchlist_entry = Watchlist.objects.all().filter(listing__id=listing_id, user__id=request.user.id)
+        except:
+            watchlist_entry = None
+        if watchlist_entry:
+            watchlist_entry.delete()
+        else:
+            new_watchlist_entry = Watchlist(user=request.user, listing=listing)
+            new_watchlist_entry.save()
+        return redirect('auctions:listings', listing_id=listing_id)
+    else:
+        return redirect("auctions:login")
+
+
+def listings(request, listing_id):
+
+    # query listings by listing_id (or render error)
+    try:
+        listing = Listing.objects.get(id=int(listing_id))
+    except:
+        return render(request, "error.html", {
+            "error": "404 / Listing doesn't exist."
+        })
+    # query for highest bid or set None
+    try:
+        highest_bid = Listing.objects.get(id=listing_id).highest_bid
+    except:
+        highest_bid = None
+    # query for comments or set None
+    try:
+        comments = Comment.objects.all().filter(listing__id=listing_id)
+    except:
+        comments = None
+    # query for watchlist entry or set None
+    try:
+        watchlist_entry = Watchlist.objects.all().filter(listing__id=listing_id, user__id=request.user.id)
+    except:
+        watchlist_entry = None
+      
+    # unbound form instance
+    bid_form = BidForm()  
+    comment_form = CommentForm()
+
+    # add everything to a context dictionary
+    context = {
+    "listing": listing,
+    "bid_form": bid_form,
+    "highest_bid": highest_bid,
+    "comment_form": comment_form,
+    "comments": comments,
+    "watchlist_entry": watchlist_entry,
+    }
+
+    if request.method == "POST":
+        if request.user.is_authenticated:
+            # check for the form
+            if request.POST.get("form_type") == 'place_bid':
+                bid_form = BidForm(request.POST)
+                if bid_form.is_valid():
+                    bid = bid_form.cleaned_data.get('bid')
+                    try:
+                        highest_bid = Bid.objects.all().filter(listing__id=listing_id).order_by("-bid").first().bid
+                    except:
+                        highest_bid = 0
+                    if bid <= highest_bid or bid <= listing.price:
+                        bid_form.add_error("bid", "Your bid is too low :(")
+                        context["bid_form"] = bid_form
+                        return render(request, "auctions/listings.html", context)
+
+                    # Save highest bid to Listing
+                    listing_to_update = Listing.objects.get(id=listing_id)
+                    listing_to_update.highest_bid = bid
+                    listing_to_update.save()
+                    # Save highest bid to Bid (Model)
+                    form_tmp = bid_form.save(commit=False)
+                    form_tmp.user = request.user
+                    form_tmp.listing = listing
+                    form_tmp.save()
+                    return redirect('auctions:listings', listing_id=listing_id)
+            
+            elif request.POST.get("form_type") == "post_comment":
+                    comment_form = CommentForm(request.POST)
+
+                    # TODO Check for comment length!
+
+                    if comment_form.is_valid():
+                        form_tmp = comment_form.save(commit=False)
+                        form_tmp.user = request.user
+                        form_tmp.listing = listing
+                        form_tmp.save()
+                        return redirect('auctions:listings', listing_id=listing_id)
+        else: # if user is not authenticated
+            return redirect("auctions:login")
+
+    elif request.method == "GET":
+        return render(request, "auctions/listings.html", context)
 
 
 def create_listing(request):
@@ -36,95 +154,6 @@ def create_listing(request):
         return render(request, "auctions/create_listing.html", {
             "form": form
         })
-
-
-def listings(request, listing_id):
-    # query listing by listing_id (or render error)
-    try:
-        listing = Listing.objects.get(id=int(listing_id))
-    except:
-        return render(request, "error.html", {
-            "error": "404 / Listing doesn't exist."
-        })
-    # query for highest bid or set None
-    try:
-        highest_bid = Bid.objects.all().filter(listing__id=listing_id).order_by("-bid").first().bid
-    except:
-        highest_bid = None
-
-    # query for comments
-    try:
-        comments = Comment.objects.all().filter(listing__id=listing_id)
-    except:
-        comments = None
-
-    print(comments)
-    
-    # unbound form instance
-    bid_form = BidForm()
-    comment_form = CommentForm()
-
-    return render(request, "auctions/listings.html", {
-        "listing": listing,
-        "bid_form": bid_form,
-        "highest_bid": highest_bid,
-        "comment_form": comment_form,
-        "comments": comments,
-    })
-
-
-def place_bid(request, listing_id):
-    if request.method == "POST":
-        bid_form = BidForm(request.POST)
-        comment_form = CommentForm()
-        listing = Listing.objects.get(id=int(listing_id))
-        if bid_form.is_valid():
-            
-            bid = bid_form.cleaned_data.get('bid')
-            
-            try:
-                highest_bid = Bid.objects.all().filter(listing__id=listing_id).order_by("-bid").first().bid
-            except:
-                highest_bid = 0
-
-            if bid <= highest_bid or bid <= listing.price:
-                bid_form.add_error('bid', 'Your bid is too low.')
-                print(highest_bid)
-                return render(request, "auctions/listings.html", {
-                    "listing": listing,
-                    "bid_form": bid_form,
-                    "comment_form": comment_form,
-                    "highest_bid": highest_bid
-                })
-
-            form_tmp = bid_form.save(commit=False)
-            form_tmp.user = request.user
-            form_tmp.listing = listing
-            form_tmp.save()
-            return redirect('auctions:listings', listing_id=listing_id)         
-
-    elif request.method == "GET":
-        return HttpResponseRedirect(reverse("auctions:index"))
-
-
-def post_comment(request, listing_id):
-    if request.method == "POST":
-        pass
-    
-    elif request.method == "GET":
-        return HttpResponseRedirect(reverse("auctions:index"))
-
-
-
-
-
-
-def index(request):
-    listings = Listing.objects.all()
-
-    return render(request, "auctions/index.html", {
-        'listings': listings
-    })
 
 
 def login_view(request):
