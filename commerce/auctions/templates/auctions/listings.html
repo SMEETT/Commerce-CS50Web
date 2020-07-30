@@ -46,10 +46,10 @@
 <!-- CURRENT PRICE -->
 
 <div class="d-flex justify-content-start border pt-3 mt-2">
-    {% if highest_bid %}
-    <h3 class="mt-0 mx-2">${{ highest_bid }}</h3>
+    {% if listing.bids.last %}
+    <h3 class="mt-0 mx-2">${{ listing.bids.last.bid_price }}</h3>
     {% else %}
-    <h3 class="mt-0 mx-2">${{ listing.price }}</h3>
+    <h3 class="mt-0 mx-2">${{ listing.start_price }}</h3>
     {% endif %}
 
 <!-- PLACE BID FORM -->
@@ -59,7 +59,7 @@
         {% csrf_token %}
         <div class="form-row">
             <div class="form-group col-sm-8 mb-0">
-                {{ bid_form.bid|as_crispy_field }}
+                {{ bid_form.bid_price|as_crispy_field }}
             </div>
             <div class="form-group col-sm-4 mb-0">
                 <button type="submit" class="btn btn-primary">Place Bid</button>

@@ -10,15 +10,20 @@
     <div class="card border my-2">
         <div class="container">
             <div class="row">
-
-                <div class="d-flex justify-content-start align-items-center">
-                    <h4 class="ml-2 mt-1"><a href="/listings/{{ item.id }}">{{ item }}</a></h4>
-                <!-- LISTING BADGES -->
-                    <span class="badge badge-warning listing-badge">{{ item.category }}</span>
+                <div class="col-9">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <h4 class="ml-2 mt-1"><a href="/listings/{{ item.id }}">{{ item }}</a></h4>
+                    <!-- LISTING BADGES -->
+                        <span class="badge badge-warning listing-badge">{{ item.category }}</span>
+                    </div>
                 </div>
-
+                <div class="col-3">
+                    <div class="d-flex justify-content-start align-items-center">
+                        <p class="ml-2 mt-2 mb-0">Bids: {{ item.bids.count }}</p>
+                    </div>
+                </div>
             </div>
-            <div class="row">
+            <div class="row border-top">
                 <div class="col-9">
                     <img class="card-img-left my-2 ml-2" src="{{ item.imgurl }}" alt="">
                 </div>
@@ -31,10 +36,10 @@
                     <p class="d-inline"><i>About:</i></p> <p class="text-info d-inline">{{ item.description }}</p>
                 </div>
                 <div class="col-4 my-auto">
-                    {% if item.highest_bid %}
-                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.highest_bid }} </p>
+                    {% if item.bids.last %}
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.bids.last.bid_price }} </p>
                     {% else %}
-                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.price }} </p>
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.start_price }} </p>
                     {% endif %}
                 </div>
             </div>

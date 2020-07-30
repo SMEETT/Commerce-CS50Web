@@ -7,18 +7,18 @@ class CreateListingForm(forms.ModelForm):
     
     class Meta:
         model = Listing
-        fields = ('title', 'description', 'imgurl', 'category', 'price')
+        fields = ('title', 'description', 'imgurl', 'category', 'start_price')
         widgets = {
             'title': forms.TextInput(attrs={'placeholder': 'Please enter a Title.'}),
             'description': forms.Textarea(attrs={'placeholder': 'Please add a description.'}),
             'imgurl': forms.TextInput(attrs={'placeholder': 'Please provide an Image URL.'}),
-            'price': forms.NumberInput(attrs={'placeholder': 'Please set a starting price.'})
+            'start_price': forms.NumberInput(attrs={'placeholder': 'Please set a starting price.'})
         }
 
         # Adjust LABELS where necessary
         labels = {
             'imgurl': "Image URL",
-            'price': 'Starting Bid',
+            'start_price': 'Start Price',
         }
 
     # def clean_title(self):
@@ -35,14 +35,13 @@ class CreateListingForm(forms.ModelForm):
 class BidForm(forms.ModelForm):
     class Meta:
         model = Bid
-        fields = ('bid',)
+        fields = ('bid_price',)
         widgets = {
-            'bid': forms.NumberInput(attrs={'placeholder': 'Place your Bid'})
+            'bid_price': forms.NumberInput(attrs={'placeholder': 'Place your Bid'})
         }
         labels = {
-            'bid': ""
+            'bid_price': ""
         }
-
 
 
 class CommentForm(forms.ModelForm):

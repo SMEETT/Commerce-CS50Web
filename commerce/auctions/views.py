@@ -10,6 +10,27 @@ from django.views.generic import ListView
 from .forms import CreateListingForm, BidForm, CommentForm
 from .models import User, Category, Listing, Comment, Bid, Watchlist
 
+def test(request):
+
+    listing_id = 1
+    placed_bid = 19
+
+    listing_to_update = Listing.objects.get(pk=listing_id)
+
+    bid_to_add = Bid(user=request.user, listing=listing_to_update, bid_price=placed_bid)
+    bid_to_add.save()
+
+    listing_to_update.bids.add(bid_to_add)
+    
+    test1 = Listing.objects.get(pk=listing_id).bids.last().bid_price
+    test2 = Listing.objects.get(pk=listing_id)
+    # test2 = test.objects.all()
+
+    print(test1)
+
+    return render(request, 'auctions/test.html', {
+        "data": test2
+    })
 
 
 class IndexList(ListView):
@@ -27,7 +48,10 @@ def watchlist_toggle(request, listing_id):
         try:
             listing = Listing.objects.get(id=int(listing_id))
         except:
-            return render(request, "error.html", {
+
+            # TODO fix render bug !!
+
+            return render(request, "auctions/error.html", {
                 "error": "404 / Listing doesn't exist."
             })
         try:
@@ -45,19 +69,13 @@ def watchlist_toggle(request, listing_id):
 
 
 def listings(request, listing_id):
-
     # query listings by listing_id (or render error)
     try:
-        listing = Listing.objects.get(id=int(listing_id))
+        listing = Listing.objects.get(pk=listing_id)
     except:
         return render(request, "error.html", {
             "error": "404 / Listing doesn't exist."
         })
-    # query for highest bid or set None
-    try:
-        highest_bid = Listing.objects.get(id=listing_id).highest_bid
-    except:
-        highest_bid = None
     # query for comments or set None
     try:
         comments = Comment.objects.all().filter(listing__id=listing_id)
@@ -77,7 +95,6 @@ def listings(request, listing_id):
     context = {
     "listing": listing,
     "bid_form": bid_form,
-    "highest_bid": highest_bid,
     "comment_form": comment_form,
     "comments": comments,
     "watchlist_entry": watchlist_entry,
@@ -89,25 +106,26 @@ def listings(request, listing_id):
             if request.POST.get("form_type") == 'place_bid':
                 bid_form = BidForm(request.POST)
                 if bid_form.is_valid():
-                    bid = bid_form.cleaned_data.get('bid')
+                    placed_bid = bid_form.cleaned_data.get('bid_price')
+                    
                     try:
-                        highest_bid = Bid.objects.all().filter(listing__id=listing_id).order_by("-bid").first().bid
+                        highest_bid = Listing.objects.get(pk=listing_id).bids.last().bid_price
                     except:
                         highest_bid = 0
-                    if bid <= highest_bid or bid <= listing.price:
-                        bid_form.add_error("bid", "Your bid is too low :(")
+
+                    if placed_bid <= highest_bid or placed_bid <= listing.start_price:
+                        bid_form.add_error("bid_price", "Your bid is too low :(")
                         context["bid_form"] = bid_form
                         return render(request, "auctions/listings.html", context)
 
-                    # Save highest bid to Listing
-                    listing_to_update = Listing.objects.get(id=listing_id)
-                    listing_to_update.highest_bid = bid
-                    listing_to_update.save()
-                    # Save highest bid to Bid (Model)
-                    form_tmp = bid_form.save(commit=False)
-                    form_tmp.user = request.user
-                    form_tmp.listing = listing
-                    form_tmp.save()
+                    # add placed_bid to Listing
+                    
+                    listing_to_update = Listing.objects.get(pk=listing_id)
+                    bid_to_add = Bid(user=request.user, listing=listing_to_update, bid_price=placed_bid)
+                    bid_to_add.save()
+
+                    listing_to_update.bids.add(bid_to_add)
+
                     return redirect('auctions:listings', listing_id=listing_id)
             
             elif request.POST.get("form_type") == "post_comment":
