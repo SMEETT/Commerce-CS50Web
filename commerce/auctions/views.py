@@ -6,31 +6,43 @@ from django.urls import reverse
 from django import forms
 from decimal import Decimal
 from django.views.generic import ListView
+from urllib.parse import urlparse
+import os.path
 
 from .forms import CreateListingForm, BidForm, CommentForm
 from .models import User, Category, Listing, Comment, Bid, Watchlist
 
 def test(request):
+    return render(request, 'auctions/test.html')
 
-    listing_id = 1
-    placed_bid = 19
-
-    listing_to_update = Listing.objects.get(pk=listing_id)
-
-    bid_to_add = Bid(user=request.user, listing=listing_to_update, bid_price=placed_bid)
-    bid_to_add.save()
-
-    listing_to_update.bids.add(bid_to_add)
+def close_listing(request, listing_id):
+    try:
+        listing_to_close = Listing.objects.get(pk=listing_id)
+    except:
+        return render(request, "auctions/error.html", {
+                "error": "404 / Listing doesn't exist."
+            })
     
-    test1 = Listing.objects.get(pk=listing_id).bids.last().bid_price
-    test2 = Listing.objects.get(pk=listing_id)
-    # test2 = test.objects.all()
+    if listing_to_close.user != request.user:
+        return render(request, "auctions/error.html", {
+                "error": "You can't close a listing that isn't yours!"
+            })
+    else:
+        listing_to_close.closed = True
+        listing_to_close.save()
+        return redirect('auctions:listings', listing_id=listing_id)
 
-    print(test1)
 
-    return render(request, 'auctions/test.html', {
-        "data": test2
-    })
+def my_listings (request):
+    template = "auctions/my_listings.html"
+    try:
+        my_listings = Listing.objects.filter(user=request.user)
+    except:
+        my_listings = None
+    context = {
+        'my_listings': my_listings
+    }
+    return render(request, template, context)
 
 
 class IndexList(ListView):
@@ -39,7 +51,12 @@ class IndexList(ListView):
 
 
 def watchlist(request):
-    pass
+    template = "auctions/watchlist.html"
+    watchlist = Watchlist.objects.filter(user=request.user)
+    context = {
+        'watchlist': watchlist
+    }
+    return render (request, template, context)
 
 
 def watchlist_toggle(request, listing_id):
@@ -48,9 +65,6 @@ def watchlist_toggle(request, listing_id):
         try:
             listing = Listing.objects.get(id=int(listing_id))
         except:
-
-            # TODO fix render bug !!
-
             return render(request, "auctions/error.html", {
                 "error": "404 / Listing doesn't exist."
             })
@@ -63,7 +77,16 @@ def watchlist_toggle(request, listing_id):
         else:
             new_watchlist_entry = Watchlist(user=request.user, listing=listing)
             new_watchlist_entry.save()
-        return redirect('auctions:listings', listing_id=listing_id)
+
+        # URL Parsing to decide where to redirect
+        # Returns the Origin of the Request
+        parse = urlparse(request.META['HTTP_REFERER'])
+        split = os.path.split(parse.path)
+
+        if split[1] == 'watchlist':
+            return redirect('auctions:watchlist')
+        else:
+            return redirect('auctions:listings', listing_id=listing_id)
     else:
         return redirect("auctions:login")
 
@@ -73,7 +96,7 @@ def listings(request, listing_id):
     try:
         listing = Listing.objects.get(pk=listing_id)
     except:
-        return render(request, "error.html", {
+        return render(request, "auctions/error.html", {
             "error": "404 / Listing doesn't exist."
         })
     # query for comments or set None
@@ -119,11 +142,9 @@ def listings(request, listing_id):
                         return render(request, "auctions/listings.html", context)
 
                     # add placed_bid to Listing
-                    
                     listing_to_update = Listing.objects.get(pk=listing_id)
-                    bid_to_add = Bid(user=request.user, listing=listing_to_update, bid_price=placed_bid)
+                    bid_to_add = Bid(user=request.user, bid_price=placed_bid)
                     bid_to_add.save()
-
                     listing_to_update.bids.add(bid_to_add)
 
                     return redirect('auctions:listings', listing_id=listing_id)

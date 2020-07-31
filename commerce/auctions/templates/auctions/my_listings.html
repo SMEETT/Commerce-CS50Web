@@ -1,0 +1,35 @@
+{% extends 'auctions/layout.html' %}
+
+{% block title %}
+    My Listings
+{% endblock %}
+
+{% block body %}
+    <h2>My Listings</h2>
+
+    {% for listing in my_listings %}
+        <div class="container ml-0 border mb-2 py-2">
+            <div class="row">
+                <div class="col align-self-center">
+                    <a href="{% url 'auctions:listings' listing.id %}">{{ listing.title }}</a>
+                </div>
+                <div class="col align-self-center">
+                    {% if listing.bids.last %}
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ listing.bids.last.bid_price }} </p>
+                    {% else %}
+                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ listing.start_price }} </p>
+                    {% endif %}
+                </div>
+                
+                <div class="col align-self-center">
+                    <p class="d-inline">Bids: {{ listing.bids.count }}</p>
+                </div>
+
+                <div class="col align-self-center">
+                    <a class="btn btn-secondary" href="{% url 'auctions:close_listing' listing.id %}">Close Listing</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+{% endblock %}

@@ -30,7 +30,6 @@ class Listing(models.Model):
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     bid_price = models.DecimalField(max_digits=12, decimal_places=2)
-    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.user} ({self.bid_price}) @ {self.listing}"
