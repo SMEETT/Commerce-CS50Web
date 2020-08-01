@@ -26,8 +26,17 @@
                 </div>
 
                 <div class="col align-self-center">
-                    <a class="btn btn-secondary" href="{% url 'auctions:close_listing' listing.id %}">Close Listing</a>
+                    {% if listing.closed %}
+                    <p class="btn btn-secondary d-inline">Closed</p>
+                    {% else %}
+                    <a class="btn btn-primary" href="{% url 'auctions:close_listing' listing.id %}">Close</a>
+                    {% endif %}
+
+
+                    <a class="btn btn-primary" href="{% url 'auctions:edit_listing' listing.id %}">Edit</a>
+                    <a class="btn btn-primary" href="{% url 'auctions:close_listing' listing.id %}">Delete</a>
                 </div>
+
             </div>
         </div>
     {% endfor %}

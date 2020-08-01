@@ -1,7 +1,7 @@
 from django import forms
 from .models import Listing, Category, Bid, Comment
 
-class CreateListingForm(forms.ModelForm):
+class ListingForm(forms.ModelForm):
     # populate the CATEGORY dropdown with all available categories
     category = forms.ModelChoiceField(queryset=Category.objects.all(), widget=forms.Select)
     

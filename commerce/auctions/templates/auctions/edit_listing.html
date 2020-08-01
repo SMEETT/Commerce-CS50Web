@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title%}
-Create Listing
+Edit Listing
 {% endblock %}
 
 {% block body %}
@@ -14,14 +14,14 @@ Create Listing
     {{ message }}
 </div>
 {% endif %}
-<form action="{% url 'auctions:create_listing' %}" method="post">
+<form action="{% url 'auctions:edit_listing' listing.id %}" method="post">
     <div class="form-group">
         {% csrf_token %}
         
         {{ form|crispy }}
         
     </div>
-    <input type="submit" value="Create" class="btn btn-primary">
+    <input type="submit" value="Save" class="btn btn-primary">
 </form>
     
 {% endblock %}

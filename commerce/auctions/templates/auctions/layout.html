@@ -8,46 +8,49 @@
         <link href="{% static 'auctions/styles.css' %}" rel="stylesheet">
     </head>
     <body>
-        <h1>Commerce {{ current_year }}</h1>
-        <div>
-            {% if user.is_authenticated %}
-                Signed in as <strong>{{ user.username }}</strong>.
+        <div class="">
+        <h1 class='display-4 d-inline'>Commerce {{ current_year }}</h1>
+         <!-- {% if user.is_authenticated %}
+                <p class="d-inline ml-2">Signed in as <strong>{{ user.username }}</strong>.</p>
             {% else %}
                 Not signed in.
-            {% endif %}
+            {% endif %} -->
         </div>
+        <hr>
+        {% with url_name=request.resolver_match.url_name %}
         <ul class="nav">
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'auctions:index' %}">Active Listings</a>
+                <a class="btn btn-outline-primary {% if url_name == 'index' %}active{% endif %}" href="{% url 'auctions:index' %}">Active Listings</a>
             </li>
             <li>
-                <a class="nav-link" href="#">Categories</a>
+                <a class="btn btn-outline-primary ml-2  {% if url_name == 'categories' %}active{% endif %}" href="{% url 'auctions:categories' %}">Categories</a>
             </li>
 
             {% if user.is_authenticated %}
                 <li class="nav-item">
                     <li>
-                        <a class="nav-link" href="{% url 'auctions:create_listing' %}">Create Listing</a>
+                        <a class="btn btn-outline-primary ml-2  {% if url_name == 'create_listing' %}active{% endif %}" href="{% url 'auctions:create_listing' %}">Create Listing</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="{% url 'auctions:my_listings' %}">My Listings</a>
+                        <a class="btn btn-outline-primary ml-2 {% if url_name == 'my_listings' %}active{% endif %}" href="{% url 'auctions:my_listings' %}">My Listings</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="{% url 'auctions:watchlist' %}">Watchlist</a>
+                        <a class="btn btn-outline-primary ml-2 {% if url_name == 'watchlist' %}active{% endif %}" href="{% url 'auctions:watchlist' %}">Watchlist</a>
                     </li>
                     <li>
-                        <a class="nav-link" href="{% url 'auctions:logout' %}">Log Out</a>
+                        <a class="btn btn-outline-primary ml-2 {% if url_name == 'logout' %}active{% endif %}" href="{% url 'auctions:logout' %}">Log Out</a>
                     </li>
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:login' %}">Log In</a>
+                    <a class="btn btn-outline-primary ml-2 {% if url_name == 'login' %}active{% endif %}" href="{% url 'auctions:login' %}">Log In</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'auctions:register' %}">Register</a>
+                    <a class="btn btn-outline-primary ml-2 {% if url_name == 'register' %}active{% endif %}" href="{% url 'auctions:register' %}">Register</a>
                 </li>
             {% endif %}
         </ul>
+        {% endwith %}
         <hr>
         {% block body %}
         {% endblock %}
