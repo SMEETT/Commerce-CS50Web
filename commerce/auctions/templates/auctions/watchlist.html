@@ -11,31 +11,22 @@
         <div class="container ml-0 border mb-2 py-2">
             <div class="row">
                 <div class="col align-self-center">
-                    <a href="{% url 'auctions:listings' item.listing.id %}">{{ item.listing.title }}</a>
+                    <a class='lead' href="{% url 'auctions:listings' item.listing.id %}">{{ item.listing.title }}</a>
                 </div>
                 <div class="col align-self-center">
                     {% if item.listing.bids.last %}
-                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.listing.bids.last.bid_price }} </p>
+                    <p class="d-inline lead">Price:</p><p class="d-inline lead"> ${{ item.listing.bids.last.bid_price }} </p>
                     {% else %}
-                    <p class="d-inline">Price:</p><p class="text-success d-inline"> ${{ item.listing.start_price }} </p>
+                    <p class="d-inline lead">Price:</p><p class="d-inline lead"> ${{ item.listing.start_price }} </p>
                     {% endif %}
                 </div>
                 
-                <div class="col align-self-center">
-                    <p class="d-inline">Bids: {{ item.listing.bids.count }}</p>
+                <div class="col-2 align-self-center">
+                    <p class="d-inline lead">Bids: {{ item.listing.bids.count }}</p>
                 </div>
 
-                <div class="col align-self-center">
-                    {% if item.listing.bids.last.user == request.user %}
-                        <p class="d-inline my-0">Highest Bidder: Yes</p>
-                    {% elif not item.listing.bids.last %}
-                        <p class="d-inline my-0">No bids yet!</p>
-                    {% else %}
-                    <p class="d-inline my-0">Highest Bidder: No</p>
-                    {% endif%}
-                </div>
-                <div class="col align-self-center">
-                    <a class="btn btn-secondary" href="{% url 'auctions:watchlist_toggle' item.listing.id %}">Remove</a>
+                <div class="col-2 align-self-center">
+                    <a class="btn btn-link" href="{% url 'auctions:watchlist_toggle' item.listing.id %}">Remove</a>
                 </div>
             </div>
         </div>

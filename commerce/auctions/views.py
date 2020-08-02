@@ -87,7 +87,6 @@ def create_listing(request):
         })
 
 
-
 @login_required
 def close_listing(request, listing_id):
     try:

@@ -1,5 +1,17 @@
 body {
-    padding: 10px;
+
+    width: 90vw;
+    margin: auto;
+}
+
+html {
+  overflow: -moz-scrollbars-vertical; 
+  overflow-y: scroll;
+}
+
+.mt-sp {
+  margin-top: 4px;
+  margin-bottom: 0px;
 }
 
 .listing-img {

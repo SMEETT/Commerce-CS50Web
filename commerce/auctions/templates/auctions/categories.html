@@ -4,15 +4,17 @@
     Categories
 {% endblock %}
 
+
 {% block body %}
     <h2>Categories</h2>
+    <hr>
     {% for item in categories_id %}
         {% for category in categories %}
             {% if category.id == item.category %}
-                <h4>{{ category.category }}</h4>
+                <h4 class="mb-0 mt-2">{{ category.category }}</h4>
                 {% for listing in listings %}
                     {% if listing.category.id == category.id%}
-                        <a href="/listings/{{ listing.id }}">{{ listing.title }}</a> <br>
+                        <a class="mt-0" href="/listings/{{ listing.id }}">{{ listing.title }}</a> <br>
                     {% endif %}
                 {% endfor %}
             {% endif %}

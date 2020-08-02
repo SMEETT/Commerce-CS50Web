@@ -9,16 +9,19 @@
     </head>
     <body>
         <div class="">
-        <h1 class='display-4 d-inline'>Commerce {{ current_year }}</h1>
+        <!-- <h1 class='display-4 d-inline'>Commerce {{ current_year }}</h1> -->
          <!-- {% if user.is_authenticated %}
                 <p class="d-inline ml-2">Signed in as <strong>{{ user.username }}</strong>.</p>
             {% else %}
                 Not signed in.
             {% endif %} -->
         </div>
-        <hr>
+
         {% with url_name=request.resolver_match.url_name %}
-        <ul class="nav">
+        <ul class="nav mt-4">
+            <li class="nav-item">
+                <h4 class='mr-3 mt-sp'>COMMERCE 2020</h4>
+            </li>
             <li class="nav-item">
                 <a class="btn btn-outline-primary {% if url_name == 'index' %}active{% endif %}" href="{% url 'auctions:index' %}">Active Listings</a>
             </li>
@@ -38,7 +41,7 @@
                         <a class="btn btn-outline-primary ml-2 {% if url_name == 'watchlist' %}active{% endif %}" href="{% url 'auctions:watchlist' %}">Watchlist</a>
                     </li>
                     <li>
-                        <a class="btn btn-outline-primary ml-2 {% if url_name == 'logout' %}active{% endif %}" href="{% url 'auctions:logout' %}">Log Out</a>
+                        <a class="btn btn-outline-primary ml-2 {% if url_name == 'logout' %}active{% endif %}" href="{% url 'auctions:logout' %}">Log Out ({{ user.username }})</a>
                     </li>
                 </li>
             {% else %}
