@@ -13,8 +13,11 @@ import os.path
 from .forms import ListingForm, BidForm, CommentForm
 from .models import User, Category, Listing, Comment, Bid, Watchlist
 
-def test(request):
-    return render(request, 'auctions/test.html')
+
+class IndexList(ListView):
+    model = Listing
+    template_name = "auctions/index.html"
+
 
 def categories(request):
     template = 'auctions/categories.html'
@@ -27,6 +30,23 @@ def categories(request):
         'listings': listings,
     })
 
+
+@login_required
+def delete_listing(request, listing_id):
+    try:
+        listing_to_delete = Listing.objects.get(pk=listing_id)
+    except:
+        return render(request, "auctions/error.html", {
+        "error": "404 / Listing doesn't exist."
+        })
+
+    if listing_to_delete.user != request.user:
+        return render(request, "auctions/error.html", {
+            "error": "You can't delete a listing that isn't yours!"
+        })
+    listing_to_delete.delete()
+    return redirect("auctions:index")
+    
 
 @login_required
 def edit_listing(request, listing_id):
@@ -117,10 +137,6 @@ def my_listings (request):
     }
     return render(request, template, context)
 
-
-class IndexList(ListView):
-    model = Listing
-    template_name = "auctions/index.html"
 
 @login_required
 def watchlist(request):

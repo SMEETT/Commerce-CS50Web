@@ -2,53 +2,54 @@
 
 {% block body %}
     <h2>Active Listings ({{ listings_count }})</h2>
-
-<div class="container ml-0">
-    <div class="row">
-{% for item in listing_list %}
-<div class="container w-50 ml-0">
-    <div class="card border ml-0 my-4">
-        <div class="container ml-0">
-            <div class="row my-2">
-                <div class="col">
-                    <div class="d-flex justify-content-start align-items-center">
-                        <h4 class="ml-2 mt-1"><a href="/listings/{{ item.id }}">{{ item }}</a></h4>
-                    <!-- LISTING BADGES -->
-                        <span class="badge badge-warning listing-badge">{{ item.category }}</span>
+    <div class="container ml-0">
+        <div class="row">
+        {% for item in listing_list %}
+            <div class="container w-50 ml-0">
+                <div class="card border ml-0 my-4">
+                    <div class="container ml-0">
+                        <div class="row my-2">
+                            <div class="col">
+                                <div class="d-flex justify-content-start align-items-center">
+<!-- LISTING TITLE/LINK -->
+                                    <h4 class="ml-2 mt-1"><a href="/listings/{{ item.id }}">{{ item }}</a></h4>
+<!-- LISTING BADGES -->
+                                    <span class="badge badge-warning listing-badge">{{ item.category }}</span>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="d-flex justify-content-end align-items-center">
+<!-- DETAILS LINK -->
+                                    <p class='mt-2 mb-0 mr-2'><a href="/listings/{{ item.id }}">Details</a></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row border-top">
+                            <div class="col-9">
+<!-- IMAGE -->
+                                <img class="card-img-left my-4 ml-2" src="{{ item.imgurl }}" alt="">
+                            </div>
+                        </div>
+                        <div class="row border-top py-2">
+                            <div class="col mt-2 ml-1 my-auto">
+<!-- DESCRIPTION -->
+                                <p class="d-inline">{{ item.description }}</p>
+                            </div>
+                        </div>
+                        <div class="row border-top py-2">
+                            <div class="col ml-1 my-auto">
+<!-- PRICE -->
+                                {% if item.bids.last %}
+                                <p class="d-inline"></p><h4 class="d-inline"> ${{ item.bids.last.bid_price }} </h4>
+                                {% else %}
+                                <p class="d-inline"></p><h4 class="d-inline"> ${{ item.start_price }} </h4>
+                                {% endif %}
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="col">
-                    <div class="d-flex justify-content-end align-items-center">
-                        <p class='mt-2 mb-0 mr-2'><a href="/listings/{{ item.id }}">Details</a></p>
-                    </div>
-                </div>
             </div>
-            <div class="row border-top">
-                <div class="col-9">
-                    <img class="card-img-left my-4 ml-2" src="{{ item.imgurl }}" alt="">
-                </div>
-            </div>
-            <div class="row border-top py-2">
-                <div class="col mt-2 ml-1 my-auto">
-                    <p class="d-inline">{{ item.description }}</p>
-                </div>
-            </div>
-            <div class="row border-top py-2">
-                <div class="col ml-1 my-auto">
-                    {% if item.bids.last %}
-                    <p class="d-inline"></p><h4 class="d-inline"> ${{ item.bids.last.bid_price }} </h4>
-                    {% else %}
-                    <p class="d-inline"></p><h4 class="d-inline"> ${{ item.start_price }} </h4>
-                    {% endif %}
-                </div>
-
-            </div>
-            
+        {% endfor %}
         </div>
     </div>
-</div>
-{% endfor %}
-</div>
-</div>
-    
 {% endblock %}

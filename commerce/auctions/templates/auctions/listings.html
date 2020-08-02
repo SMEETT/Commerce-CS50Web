@@ -34,25 +34,16 @@
 
 </div>
 
-<!-- ADD TO WATCHLIST -->
-<!-- {% if watchlist_entry %}
-    <a class="btn btn-secondary" href="{% url 'auctions:watchlist_toggle' listing.id %}">Remove from Watchlist</a>
-{% else %}
-    <a class="btn btn-primary" href="{% url 'auctions:watchlist_toggle' listing.id %}">Add to Watchlist</a>
-{% endif %} -->
-
-<!-- EDIT LISTING -->
-
-<!-- {% if request.user == listing.user %}
-    <a class="btn btn-primary" href="{% url 'auctions:edit_listing' listing.id %}">Edit</a>
-{% endif %} -->
-
 <!-- WON AUCTION MESSAGE -->
 
 {% if listing.closed %}
 <hr>
     <div class="container ml-0 mt-2 pl-0">
+        {% if listing.bids.last %}
         <p class="lead">{{ listing.bids.last.user }} bought this article for $<u>{{ listing.bids.last.bid_price }}</u> </p>
+        {% else %}
+        <p class="lead">This Listing was closed before any bids were placed :(</p>
+        {% endif %}
     </div>
 {% endif %}
 

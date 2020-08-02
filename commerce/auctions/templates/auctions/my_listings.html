@@ -6,7 +6,6 @@
 
 {% block body %}
     <h2>My Listings</h2>
-
     {% for listing in my_listings %}
         <div class="container ml-0 border mb-2 py-2">
             <div class="row">
@@ -20,24 +19,19 @@
                     <p class="d-inline lead">Price:</p><p class="d-inline lead"> ${{ listing.start_price }} </p>
                     {% endif %}
                 </div>
-                
                 <div class="col-2 align-self-center">
                     <p class="d-inline lead">Bids: {{ listing.bids.count }}</p>
                 </div>
-
                 <div class="col align-self-center">
                     <a class="btn btn-link" href="{% url 'auctions:edit_listing' listing.id %}">Edit</a>
-                    <a class="btn btn-link" href="{% url 'auctions:close_listing' listing.id %}">Delete</a>
+                    <a class="btn btn-link" href="{% url 'auctions:delete_listing' listing.id %}">Delete</a>
                     {% if listing.closed %}
                     <p class="btn btn-link d-inline inactive">Closed</p>
                     {% else %}
                     <a class="btn btn-link" href="{% url 'auctions:close_listing' listing.id %}">Close</a>
                     {% endif %}
-
                 </div>
-
             </div>
         </div>
     {% endfor %}
-
 {% endblock %}

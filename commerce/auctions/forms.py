@@ -21,13 +21,6 @@ class ListingForm(forms.ModelForm):
             'start_price': 'Start Price',
         }
 
-    # def clean_title(self):
-    #     title= self.cleaned_data.get('title')
-    #     if Listing.objects.filter(title=title).exists():
-    #         print("Validation ERROR!")
-    #         raise forms.ValidationError("This listing already exists!")
-    #     return title
-
 
 # this form doesn't need any css-classes as attrs, since it uses CrispyForm 
 # to be able to render it in a row
